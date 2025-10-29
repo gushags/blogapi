@@ -1,24 +1,32 @@
 // routes/usersRouter.js
 const { Router } = require('express');
 const usersRouter = Router();
+const {
+  validateNewUser,
+  validateUpdateUser,
+} = require('../validators/userValidators');
 
-usersRouter.get('/', (req, res) => {
-  res.json({ data: 'This is the all users GET route' });
-});
-usersRouter.get('/:userId', (req, res) => {
-  const { userId } = req.params;
-  res.json({ data: `This is the users GET route for userId: ${userId}` });
-});
-usersRouter.post('/', (req, res) => {
-  res.json({ data: 'This is the users POST route.' });
-});
-usersRouter.put('/:userId', (req, res) => {
-  const { userId } = req.params;
-  res.json({ data: `This is the users PUT route for userId: ${userId}` });
-});
-usersRouter.delete('/:userId', (req, res) => {
-  const { userId } = req.params;
-  res.json({ data: `This is the users DELETE route for userId: ${userId}` });
-});
+const {
+  createUserControl,
+  getUserControl,
+  getAllUsersControl,
+  deleteUserControl,
+  updateUserControl,
+} = require('../controllers/userController');
+
+// Get all users
+usersRouter.get('/', getAllUsersControl);
+
+// Get one user
+usersRouter.get('/:userId', getUserControl);
+
+// Create a user
+usersRouter.post('/', validateNewUser, createUserControl);
+
+// Update a user
+usersRouter.put('/:userId', validateUpdateUser, updateUserControl);
+
+// Delete a user
+usersRouter.delete('/:userId', deleteUserControl);
 
 module.exports = usersRouter;
