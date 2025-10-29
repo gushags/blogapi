@@ -1,0 +1,26 @@
+{
+  "name": "blog-api",
+  "version": "1.0.0",
+  "description": "Express app to serve blog posts and comments",
+  "homepage": "https://github.com/gushags/blogapi#readme",
+  "bugs": {
+    "url": "https://github.com/gushags/blogapi/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gushags/blogapi.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
