@@ -18,6 +18,7 @@ app.use(cors());
  */
 
 const usersRouter = require('./routes/usersRouter');
+const postsRouter = require('./routes/postsRouter');
 
 /**
  * ------ ROUTES ------
@@ -33,61 +34,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/users', usersRouter);
-// app.get('/session', (req, res) => {
-//   return res.send(req.context.models.users[req.context.me.id]);
-// });
-
-// app.get('/users/:userId', (req, res) => {
-//   return res.send(req.context.models.users[req.params.userId]);
-// });
-
-// app.get('/messages', (req, res) => {
-//   return res.send(Object.values(req.context.models.messages));
-// });
-
-// app.get('/messages/:messageId', (req, res) => {
-//   return res.send(req.context.models.messages[req.params.messageId]);
-// });
-
-// app.post('/messages', (req, res) => {
-//   const id = uuidv4();
-//   const message = {
-//     id,
-//     text: req.body.text,
-//     userId: req.context.me.id,
-//   };
-
-//   req.context.models.messages[id] = message;
-
-//   return res.send(message);
-// });
-
-// app.post('/users', (req, res) => {
-//   return res.send('POST HTTP method on user resource');
-// });
-
-// app.put('/users/:userId', (req, res) => {
-//   return res.send(`PUT HTTP method on user/${req.params.userId} resource`);
-// });
-
-// app.delete('/users/:userId', (req, res) => {
-//   return res.send(`DELETE HTTP method on user/${req.params.userId} resource`);
-// });
-
-// app.delete('/messages/:messageId', (req, res) => {
-//   // This deletes the message corresponding to messageId
-//   // by splitting the messages object into two parts. One is the
-//   // messageId to be deleted, and the rest is represented by the spread
-//   // operator and 'otherMessages'. To delete messageId, he simply sets
-//   // messages = to otherMessages, which excludes the messageId he wants
-//   // to delete.
-//   const { [req.params.messageId]: message, ...otherMessages } =
-//     req.context.models.messages;
-
-//   req.context.models.messages = otherMessages;
-
-//   return res.send(message);
-// });
+app.use('/posts', postsRouter);
 
 app.listen(process.env.PORT, (error) => {
   // This is important!
