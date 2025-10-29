@@ -1,26 +1,37 @@
 // routes/usersRouter.js
 const { Router } = require('express');
 const postsRouter = Router();
+const {
+  validateNewPost,
+  validateUpdatePost,
+} = require('../validators/postValidator');
 
-// Posts
-postsRouter.get('/', (req, res) => {
-  res.json({ data: 'This is the all posts GET route' });
-});
-postsRouter.get('/:postId', (req, res) => {
-  const { postId } = req.params;
-  res.json({ data: `This is the posts GET route for postId: ${postId}` });
-});
-postsRouter.post('/', (req, res) => {
-  res.json({ data: 'This is the posts POST route.' });
-});
-postsRouter.put('/:postId', (req, res) => {
-  const { postId } = req.params;
-  res.json({ data: `This is the posts PUT route for postId: ${postId}` });
-});
-postsRouter.delete('/:postId', (req, res) => {
-  const { postId } = req.params;
-  res.json({ data: `This is the posts DELETE route for postId: ${postId}` });
-});
+const {
+  createPostControl,
+  deletePostControl,
+  getAllPostsControl,
+  getPostControl,
+  updatePostControl,
+} = require('../controllers/postsController');
+
+/**
+ *  ----- ROUTES -----
+ */
+
+// Get all posts
+postsRouter.get('/', getAllPostsControl);
+
+// Get individual post
+postsRouter.get('/:postId', getPostControl);
+
+// Create new post
+postsRouter.post('/', validateNewPost, createPostControl);
+
+// Update a post
+postsRouter.put('/:postId', validateUpdatePost, updatePostControl);
+
+// Delete post
+postsRouter.delete('/:postId', deletePostControl);
 
 // Comments
 postsRouter.get('/:postId/comments', (req, res) => {

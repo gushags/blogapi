@@ -12,7 +12,7 @@ const {
   getAllUsersControl,
   deleteUserControl,
   updateUserControl,
-} = require('../controllers/userController');
+} = require('../controllers/usersController');
 
 // Get all users
 usersRouter.get('/', getAllUsersControl);

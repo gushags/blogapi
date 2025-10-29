@@ -46,17 +46,20 @@ async function validatePassword(user, password) {
 
 const validateUpdateUser = [
   body('firstname')
-    .optional()
+    .optional({ checkFalsy: true })
+    .notEmpty()
     .trim()
     .isAlpha()
     .withMessage('Only letters are allowed in first names'),
   body('lastname')
-    .optional()
+    .optional({ checkFalsy: true })
+    .notEmpty()
     .trim()
     .isAlpha()
     .withMessage('Only letters are allowed in last names'),
   body('username')
-    .optional()
+    .optional({ checkFalsy: true })
+    .notEmpty()
     .trim()
     .custom(async (value) => {
       const user = await prisma.user.findUnique({ where: { username: value } });
@@ -65,7 +68,7 @@ const validateUpdateUser = [
       }
     }),
   body('email')
-    .optional()
+    .optional({ checkFalsy: true })
     .isEmail()
     .withMessage('Valid email required')
     .custom(async (value) => {
@@ -75,7 +78,7 @@ const validateUpdateUser = [
       }
     }),
   body('pwd')
-    .optional()
+    .optional({ checkFalsy: true })
     .isLength({ min: 5 })
     .withMessage('Password must be at least 5 characters'),
 ];
