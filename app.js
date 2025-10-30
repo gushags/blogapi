@@ -20,7 +20,6 @@ app.use(cors());
 const usersRouter = require('./routes/usersRouter');
 const postsRouter = require('./routes/postsRouter');
 const authRouter = require('./routes/authRouter');
-const commentsRouter = require('./routes/commentsRouter');
 
 /**
  * ------ ROUTES ------
@@ -38,7 +37,6 @@ app.get('/', (req, res) => {
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use('/auth', authRouter);
-app.use('/comments', commentsRouter);
 
 app.listen(process.env.PORT, (error) => {
   // This is important!

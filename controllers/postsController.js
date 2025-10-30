@@ -2,6 +2,7 @@
 
 const prisma = require('../config/prismaPool');
 const { validationResult } = require('express-validator');
+const { buildCommentTree } = require('./utils/util');
 
 async function createPostControl(req, res, next) {
   const { title, content, published, authorId } = req.body;
@@ -72,28 +73,6 @@ async function getPostsControl(req, res, next) {
   }
 }
 
-/**
- * Helper: Builds a nested comment tree
- */
-function buildCommentTree(comments) {
-  const map = new Map();
-  comments.forEach((comment) =>
-    map.set(comment.id, { ...comment, replies: [] })
-  );
-
-  const roots = [];
-  comments.forEach((comment) => {
-    if (comment.parentId) {
-      const parent = map.get(comment.parentId);
-      if (parent) parent.replies.push(map.get(comment.id));
-    } else {
-      roots.push(map.get(comment.id));
-    }
-  });
-
-  return roots;
-}
-
 async function getPostControl(req, res, next) {
   try {
     const { postId } = req.params;
@@ -132,12 +111,10 @@ async function getPostControl(req, res, next) {
     };
 
     if (post) {
-      res
-        .status(200)
-        .json({
-          data: postWithComments,
-          message: 'Post retrieved successfully',
-        });
+      res.status(200).json({
+        data: postWithComments,
+        message: 'Post retrieved successfully',
+      });
     } else {
       res.status(404).json({
         error: 'There is no post with that postId.',
