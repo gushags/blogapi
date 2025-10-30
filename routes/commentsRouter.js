@@ -3,15 +3,23 @@
 const { Router } = require('express');
 const commentsRouter = Router();
 
-const { validateCommentPost } = require('../validators/commentValidator.js');
+const {
+  validateNewComment,
+  validateUpdateComment,
+} = require('../validators/commentValidator.js');
 const {
   createCommentControl,
+  //   updateCommentControl,
+  deleteCommentControl,
 } = require('../controllers/commentsController.js');
 
 /**
  *  ----- ROUTES -----
  */
 
-commentsRouter.post('/', validateCommentPost, createCommentControl);
+commentsRouter.post('/', validateNewComment, createCommentControl);
+// commentsRouter.get('/:commentId', getCommentControl);
+// commentsRouter.put('/:commentId', validateUpdateComment, updateCommentControl);
+commentsRouter.delete('/:commentId', deleteCommentControl);
 
 module.exports = commentsRouter;

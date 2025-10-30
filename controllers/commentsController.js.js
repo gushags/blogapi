@@ -31,4 +31,19 @@ async function createCommentControl(req, res, next) {
   }
 }
 
-module.exports = { createCommentControl };
+async function deleteCommentControl(req, res, next) {
+  try {
+    const { commentId } = req.params;
+    const deleteComment = await prisma.comment.delete({
+      where: { id: parseInt(commentId) },
+    });
+    res
+      .status(200)
+      .json({ data: deleteComment, message: 'Successfully deleted comment.' });
+  } catch (err) {
+    console.error(err);
+    next(err); // let Express handle error
+  }
+}
+
+module.exports = { createCommentControl, deleteCommentControl };
