@@ -29,67 +29,22 @@ async function createPostControl(req, res, next) {
 }
 
 // Get all posts and comments
-async function getPostsControl(req, res, next) {
+async function getAllPostsControl(req, res, next) {
   try {
     const posts = await prisma.post.findMany({
       include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            firstname: true,
-            lastname: true,
-            avatarUrl: true,
-            websiteUrl: true,
-            email: true,
-          },
-        },
-        comments: {
-          include: {
-            owner: {
-              select: { id: true, username: true, avatarUrl: true },
-            },
-          },
-          orderBy: { createdAt: 'asc' },
-        },
+        comments: true,
       },
-      orderBy: { createdAt: 'desc' },
     });
-
-    // Build nested comment tree for each post
-    const postsWithComments = posts.map((post) => ({
-      ...post,
-      comments: buildCommentTree(post.comments),
-    }));
-
-    res.status(200).json({
-      data: postsWithComments,
-      message: 'Posts retrieved successfully.',
-    });
+    if (posts) {
+      res.status(200).json({ data: posts });
+    } else {
+      res.status(404).json({ error: 'There are no posts in the system.' });
+    }
   } catch (err) {
     console.error(err);
-    next(err);
+    next(err); // let Express handle error
   }
-}
-
-/**
- * Helper: Builds a nested comment tree
- */
-function buildCommentTree(comments) {
-  const map = new Map();
-  comments.forEach((c) => map.set(c.id, { ...c, replies: [] }));
-
-  const roots = [];
-  comments.forEach((comment) => {
-    if (comment.parentId) {
-      const parent = map.get(comment.parentId);
-      if (parent) parent.replies.push(map.get(comment.id));
-    } else {
-      roots.push(map.get(comment.id));
-    }
-  });
-
-  return roots;
 }
 
 async function getPostControl(req, res, next) {
@@ -169,10 +124,4 @@ async function deletePostControl(req, res, next) {
   }
 }
 
-module.exports = {
-  createPostControl,
-  getPostsControl,
-  getPostControl,
-  updatePostControl,
-  deletePostControl,
-};
+module.exports = {};
