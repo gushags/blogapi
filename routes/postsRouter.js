@@ -21,6 +21,7 @@ const {
 
 const {
   getCommentsControl,
+  getSingleCommentControl,
   createCommentControl,
   deleteCommentControl,
   updateCommentControl,
@@ -56,12 +57,7 @@ postsRouter.put(
   updateCommentControl
 );
 
-postsRouter.get('/:postId/comments/:commentId', (req, res) => {
-  const { postId, commentId } = req.params;
-  res.json({
-    data: `This is the GET route for commentId ${commentId} of postId: ${postId}`,
-  });
-});
+postsRouter.get('/:postId/comments/:commentId', getSingleCommentControl);
 
 postsRouter.delete('/:postId/comments/:commentId', deleteCommentControl);
 

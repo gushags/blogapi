@@ -56,6 +56,44 @@ async function getCommentsControl(req, res, next) {
   }
 }
 
+async function getSingleCommentControl(req, res, next) {
+  const { postId, commentId } = req.params;
+  try {
+    const comment = await prisma.comment.findUnique({
+      where: { id: parseInt(commentId) },
+      include: {
+        post: { select: { id: true } },
+      },
+    });
+
+    // Handle not found
+    if (!comment) {
+      return res
+        .status(404)
+        .json({ message: 'Comment not found', data: req.params });
+    }
+
+    // Make sure the route is respected (/posts/:postId/comments/:commentId)
+    if (comment.post.id !== parseInt(postId)) {
+      return res.status(400).json({
+        message: `Comment ${commentId} does not belong to post ${postId}`,
+      });
+    }
+
+    // -- Success --
+    res
+      .status(200)
+      .json({ data: comment, message: 'Comment retrieved successfully' });
+  } catch (err) {
+    console.error(err);
+    if (err.code === 'P2025') {
+      // Prisma error: record not found
+      return res.status(404).json({ message: 'User not found.' });
+    }
+    next(err); // let Express handle error
+  }
+}
+
 async function updateCommentControl(req, res, next) {
   const { content, published, ownerId, parentId } = req.body;
   const { postId, commentId } = req.params;
@@ -112,4 +150,5 @@ module.exports = {
   deleteCommentControl,
   updateCommentControl,
   getCommentsControl,
+  getSingleCommentControl,
 };
