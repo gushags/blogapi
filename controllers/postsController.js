@@ -77,7 +77,9 @@ async function getPostsControl(req, res, next) {
  */
 function buildCommentTree(comments) {
   const map = new Map();
-  comments.forEach((c) => map.set(c.id, { ...c, replies: [] }));
+  comments.forEach((comment) =>
+    map.set(comment.id, { ...comment, replies: [] })
+  );
 
   const roots = [];
   comments.forEach((comment) => {
@@ -97,10 +99,45 @@ async function getPostControl(req, res, next) {
     const { postId } = req.params;
     const post = await prisma.post.findUnique({
       where: { id: parseInt(postId) },
-      include: { comments: true },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            avatarUrl: true,
+            websiteUrl: true,
+            email: true,
+          },
+        },
+        comments: {
+          include: {
+            owner: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    const postWithComments = {
+      ...post,
+      comments: buildCommentTree(post.comments),
+    };
+
     if (post) {
-      res.status(200).json({ data: post });
+      res
+        .status(200)
+        .json({
+          data: postWithComments,
+          message: 'Post retrieved successfully',
+        });
     } else {
       res.status(404).json({
         error: 'There is no post with that postId.',

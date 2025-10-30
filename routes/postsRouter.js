@@ -9,7 +9,7 @@ const {
 const {
   createPostControl,
   deletePostControl,
-  getAllPostsControl,
+  getPostsControl,
   getPostControl,
   updatePostControl,
 } = require('../controllers/postsController');
@@ -19,7 +19,7 @@ const {
  */
 
 // Get all posts
-postsRouter.get('/', getAllPostsControl);
+postsRouter.get('/', getPostsControl);
 
 // Get individual post
 postsRouter.get('/:postId', getPostControl);
