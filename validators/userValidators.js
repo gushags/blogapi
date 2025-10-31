@@ -41,7 +41,7 @@ const validateNewUser = [
 ];
 
 async function validatePassword(user, password) {
-  return bcrypt.compare(password, user.pwd);
+  return bcrypt.compare(password, user.hashedPwd);
 }
 
 const validateUpdateUser = [

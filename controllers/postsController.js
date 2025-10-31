@@ -5,7 +5,9 @@ const { validationResult } = require('express-validator');
 const { buildCommentTree } = require('./utils/util');
 
 async function createPostControl(req, res, next) {
-  const { title, content, published, authorId } = req.body;
+  const { title, content, published } = req.body;
+  const authorId = req.user.id;
+  console.log(authorId);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -16,10 +18,23 @@ async function createPostControl(req, res, next) {
     }
     const post = await prisma.post.create({
       data: {
-        title,
-        content,
-        published,
-        authorId,
+        title: title,
+        content: content,
+        published: Boolean(published),
+        authorId: authorId,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+            avatarUrl: true,
+            websiteUrl: true,
+          },
+        },
       },
     });
     res.status(200).json({ data: post });

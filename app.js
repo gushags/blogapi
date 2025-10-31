@@ -2,7 +2,7 @@
 
 const express = require('express');
 const cors = require('cors');
-
+const passport = require('passport');
 const app = express();
 
 app.use(express.json());
@@ -11,6 +11,16 @@ app.use(express.urlencoded({ extended: true }));
 // Gives us access to variables set in the .env file via `process.env.VARIABLE_NAME` syntax
 require('dotenv').config();
 
+// Need to require the entire Passport config module so app.js knows about it
+require('./config/passport');
+
+/**
+ * -------------- PASSPORT AUTHENTICATION ----------------
+ */
+
+app.use(passport.initialize());
+
+// Allow CORS
 app.use(cors());
 
 /**
@@ -24,15 +34,6 @@ const authRouter = require('./routes/authRouter');
 /**
  * ------ ROUTES ------
  */
-app.get('/', (req, res) => {
-  res.json({
-    data: {
-      user: 'jeff',
-      message: 'Hello World!',
-      comment: 'Ridiculous.',
-    },
-  });
-});
 
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);

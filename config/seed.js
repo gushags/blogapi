@@ -50,7 +50,8 @@ for (let i = 0; i < 30; i++) {
   // random value between 1 and 10
   const postId = Math.floor(Math.random() * 10) + 1;
   const published = true;
-  comments.push({ content, ownerId, postId, published });
+  const parentId = null;
+  comments.push({ content, ownerId, postId, parentId, published });
 }
 
 async function main() {
@@ -84,6 +85,7 @@ async function main() {
         content: comment.content,
         ownerId: comment.ownerId,
         postId: comment.postId,
+        parentId: comment.parentId,
         published: comment.published,
       },
     });

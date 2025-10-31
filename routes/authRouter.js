@@ -1,12 +1,9 @@
 const { Router } = require('express');
 const authRouter = Router();
+const { authorizeLogin } = require('../controllers/authController');
 
 // POST /auth/login
-authRouter.post('/login', (req, res) => {
-  //   const { email, password } = req.body;
-  // TODO: validate, check DB, issue token/session
-  res.json({ message: 'Login route hit' });
-});
+authRouter.post('/login', authorizeLogin);
 
 // POST /auth/logout
 authRouter.post('/logout', (req, res) => {

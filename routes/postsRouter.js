@@ -11,6 +11,8 @@ const {
   validateUpdateComment,
 } = require('../validators/commentValidator.js');
 
+const { authenticateToken } = require('../validators/authValidator.js');
+
 const {
   createPostControl,
   deletePostControl,
@@ -38,7 +40,7 @@ postsRouter.get('/', getPostsControl);
 postsRouter.get('/:postId', getPostControl);
 
 // Create new post
-postsRouter.post('/', validateNewPost, createPostControl);
+postsRouter.post('/', validateNewPost, authenticateToken, createPostControl);
 
 // Update a post
 postsRouter.put('/:postId', validateUpdatePost, updatePostControl);
