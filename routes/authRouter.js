@@ -1,14 +1,13 @@
 const { Router } = require('express');
 const authRouter = Router();
+const { validateNewUser } = require('../validators/userValidators');
 const { authorizeLogin } = require('../controllers/authController');
+const { createUserControl } = require('../controllers/usersController');
+
+// POST /auth/register
+authRouter.post('/register', validateNewUser, createUserControl);
 
 // POST /auth/login
 authRouter.post('/login', authorizeLogin);
-
-// POST /auth/logout
-authRouter.post('/logout', (req, res) => {
-  // TODO: clear session or revoke token
-  res.json({ message: 'Logout route hit' });
-});
 
 module.exports = authRouter;

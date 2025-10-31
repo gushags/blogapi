@@ -54,9 +54,28 @@ for (let i = 0; i < 30; i++) {
   comments.push({ content, ownerId, postId, parentId, published });
 }
 
+// Create an admin user
+async function createAdminPwd() {
+  return await bcrypt.hash('irish', 10);
+}
+
 async function main() {
+  const adminHashedPassword = await createAdminPwd();
+  const adminUser = {
+    data: {
+      firstname: 'admin',
+      lastname: 'admin',
+      username: 'admin',
+      email: 'admin@example.com',
+      hashedPwd: adminHashedPassword,
+      isAuthor: true,
+      isAdmin: true,
+    },
+  };
+  await prisma.user.create(adminUser);
   for (const user of users) {
     const hashedPassword = await bcrypt.hash(user.pwd, 10);
+
     await prisma.user.create({
       data: {
         firstname: user.firstname,

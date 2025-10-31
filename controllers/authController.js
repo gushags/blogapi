@@ -21,7 +21,7 @@ async function authorizeLogin(req, res, next) {
             email: user.email,
             role: user.isAdmin ? 'admin' : 'user',
           },
-          process.env.SECRET,
+          process.env.JWT_SECRET,
           {
             expiresIn: '24h',
           }
