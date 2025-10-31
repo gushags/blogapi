@@ -43,24 +43,43 @@ postsRouter.get('/:postId', getPostControl);
 postsRouter.post('/', validateNewPost, authenticateToken, createPostControl);
 
 // Update a post
-postsRouter.put('/:postId', validateUpdatePost, updatePostControl);
+// todo update the controller
+postsRouter.put(
+  '/:postId',
+  validateUpdatePost,
+  authenticateToken,
+  updatePostControl
+);
 
 // Delete post
-postsRouter.delete('/:postId', deletePostControl);
+postsRouter.delete('/:postId', authenticateToken, deletePostControl);
 
 // Comments
 postsRouter.get('/:postId/comments', getCommentsControl);
 
-postsRouter.post('/:postId/comments', validateNewComment, createCommentControl);
+// Todo update the controller
+postsRouter.post(
+  '/:postId/comments',
+  validateNewComment,
+  authenticateToken,
+  createCommentControl
+);
 
+// Todo update the controller -- user must be comment author
 postsRouter.put(
   '/:postId/comments/:commentid',
   validateUpdateComment,
+  authenticateToken,
   updateCommentControl
 );
 
 postsRouter.get('/:postId/comments/:commentId', getSingleCommentControl);
 
-postsRouter.delete('/:postId/comments/:commentId', deleteCommentControl);
+// Todo update controller -- user must be comment author
+postsRouter.delete(
+  '/:postId/comments/:commentId',
+  authenticateToken,
+  deleteCommentControl
+);
 
 module.exports = postsRouter;

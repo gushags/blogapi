@@ -147,8 +147,9 @@ async function getPostControl(req, res, next) {
 }
 
 async function updatePostControl(req, res, next) {
-  const { title, content, published, authorId } = req.body;
+  const { title, content, published } = req.body;
   const { postId } = req.params;
+  const authorId = req.user.id;
 
   try {
     const errors = validationResult(req);
@@ -158,17 +159,69 @@ async function updatePostControl(req, res, next) {
         data: req.body,
       });
     }
+
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(postId) },
+    });
+
+    if (!post) {
+      res.status(404).json({ message: 'Post not found.' });
+    }
+
+    if (post.authorId !== authorId) {
+      res
+        .status(403)
+        .json({ message: 'Posts can only be updated by their author.' });
+    }
+
     const updateData = {};
     if (title !== undefined) updateData.title = title;
     if (content !== undefined) updateData.content = content;
     if (published !== undefined) updateData.published = published;
-    if (authorId !== undefined) updateData.authorId = authorId;
 
-    const post = await prisma.post.update({
+    await prisma.post.update({
       where: { id: parseInt(postId) },
       data: updateData,
     });
-    res.status(200).json({ data: post, message: 'Post updated successfully.' });
+
+    const updatedPost = await prisma.post.findUnique({
+      where: { id: parseInt(postId) },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            firstname: true,
+            lastname: true,
+            avatarUrl: true,
+            websiteUrl: true,
+            email: true,
+          },
+        },
+        comments: {
+          include: {
+            owner: {
+              select: {
+                id: true,
+                username: true,
+                email: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const updatedPostWithComments = {
+      ...updatedPost,
+      comments: buildCommentTree(updatedPost.comments),
+    };
+
+    res.status(200).json({
+      data: updatedPostWithComments,
+      message: 'Post updated successfully.',
+    });
   } catch (err) {
     console.error(err);
     if (err.code === 'P2025') {
@@ -182,6 +235,20 @@ async function updatePostControl(req, res, next) {
 async function deletePostControl(req, res, next) {
   try {
     const { postId } = req.params;
+    const authorId = req.user.id;
+    const post = await prisma.post.findUnique({
+      where: { id: parseInt(postId) },
+    });
+
+    if (!post) {
+      res.status(404).json({ message: 'Post not found.' });
+    }
+
+    if (post.authorId !== authorId) {
+      res
+        .status(403)
+        .json({ message: 'Posts can only be deleted by their author.' });
+    }
     const deletePost = await prisma.post.delete({
       where: { id: parseInt(postId) },
     });
@@ -190,10 +257,6 @@ async function deletePostControl(req, res, next) {
       .json({ data: deletePost, message: 'Successfully deleted post.' });
   } catch (err) {
     console.error(err);
-    if (err.code === 'P2025') {
-      // Prisma error: record not found
-      return res.status(404).json({ message: 'Post not found.' });
-    }
     next(err); // let Express handle error
   }
 }
