@@ -7,7 +7,6 @@ const { buildCommentTree } = require('./utils/util');
 async function createPostControl(req, res, next) {
   const { title, content, published } = req.body;
   const authorId = req.user.id;
-  console.log(authorId);
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -5,7 +5,8 @@ const { validationResult } = require('express-validator');
 const { buildCommentTree } = require('./utils/util');
 
 async function createCommentControl(req, res, next) {
-  const { content, published, ownerId, parentId, postId } = req.body;
+  const { content, published, parentId, postId } = req.body;
+  const ownerId = req.user.id;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -18,8 +19,8 @@ async function createCommentControl(req, res, next) {
       data: {
         content: content,
         published: Boolean(published),
-        ownerId: parseInt(ownerId),
-        parentId: parseInt(parentId),
+        ownerId: ownerId,
+        parentId: parseInt(parentId) || null,
         postId: parseInt(postId),
       },
     });
@@ -95,8 +96,9 @@ async function getSingleCommentControl(req, res, next) {
 }
 
 async function updateCommentControl(req, res, next) {
-  const { content, published, ownerId, parentId } = req.body;
+  const { content, published } = req.body;
   const { postId, commentId } = req.params;
+  const ownerId = req.user.id;
 
   try {
     const errors = validationResult(req);
@@ -106,20 +108,32 @@ async function updateCommentControl(req, res, next) {
         data: req.body,
       });
     }
+    const comment = await prisma.comment.findUnique({
+      where: { id: parseInt(commentId) },
+    });
+
+    if (comment.postId !== parseInt(postId)) {
+      return res.status(400).json({
+        message: `Comment ${commentId} does not belong to post ${postId} and cannot be updated.`,
+      });
+    }
+    if (comment.ownerId !== ownerId) {
+      return res.status(400).json({
+        message: 'Comments can only be updated by their owner. Request denied.',
+      });
+    }
+
     const updateData = {};
     if (content !== undefined) updateData.content = content;
     if (published !== undefined) updateData.published = published;
-    if (ownerId !== undefined) updateData.ownerId = ownerId;
-    if (parentId !== undefined) updateData.parentId = parentId;
-    if (postId !== undefined) updateData.postId = postId;
 
-    const comment = await prisma.comment.update({
+    const updatedComment = await prisma.comment.update({
       where: { id: parseInt(commentId) },
       data: updateData,
     });
     res
       .status(200)
-      .json({ data: comment, message: 'Comment updated successfully.' });
+      .json({ data: updatedComment, message: 'Comment updated successfully.' });
   } catch (err) {
     console.error(err);
     if (err.code === 'P2025') {

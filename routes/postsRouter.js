@@ -43,7 +43,6 @@ postsRouter.get('/:postId', getPostControl);
 postsRouter.post('/', validateNewPost, authenticateToken, createPostControl);
 
 // Update a post
-// todo update the controller
 postsRouter.put(
   '/:postId',
   validateUpdatePost,
@@ -67,7 +66,7 @@ postsRouter.post(
 
 // Todo update the controller -- user must be comment author
 postsRouter.put(
-  '/:postId/comments/:commentid',
+  '/:postId/comments/:commentId',
   validateUpdateComment,
   authenticateToken,
   updateCommentControl

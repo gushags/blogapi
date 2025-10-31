@@ -4,18 +4,15 @@ const { body } = require('express-validator');
 
 const validateNewComment = [
   body('content').notEmpty().withMessage('Comment cannot be empty'),
-  body('published').isBoolean(),
-  body('ownerId')
+  body('postId')
     .notEmpty()
-    .withMessage('An owner must be associated with each post.'),
+    .withMessage('Comment must be associated with a postId'),
+  body('published').toBoolean().isBoolean(),
 ];
 
 const validateUpdateComment = [
   body('content').notEmpty().withMessage('Comment cannot be empty'),
-  body('published').isBoolean(),
-  body('ownerId')
-    .notEmpty()
-    .withMessage('An owner must be associated with each post.'),
+  body('published').toBoolean().isBoolean(),
 ];
 
 module.exports = { validateNewComment, validateUpdateComment };
