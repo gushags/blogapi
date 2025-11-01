@@ -11,8 +11,11 @@ const validateNewComment = [
 ];
 
 const validateUpdateComment = [
-  body('content').notEmpty().withMessage('Comment cannot be empty'),
-  body('published').toBoolean().isBoolean(),
+  body('content')
+    .optional({ checkFalsy: true })
+    .notEmpty()
+    .withMessage('Comment cannot be empty'),
+  body('published').optional({ checkFalsy: true }).toBoolean().isBoolean(),
 ];
 
 module.exports = { validateNewComment, validateUpdateComment };

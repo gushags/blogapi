@@ -67,7 +67,7 @@ async function getSingleCommentControl(req, res, next) {
       },
     });
 
-    // Handle not found
+    // Handle if not found
     if (!comment) {
       return res
         .status(404)
@@ -99,6 +99,7 @@ async function updateCommentControl(req, res, next) {
   const { content, published } = req.body;
   const { postId, commentId } = req.params;
   const ownerId = req.user.id;
+  const isAdmin = req.user.role;
 
   try {
     const errors = validationResult(req);
@@ -117,9 +118,10 @@ async function updateCommentControl(req, res, next) {
         message: `Comment ${commentId} does not belong to post ${postId} and cannot be updated.`,
       });
     }
-    if (comment.ownerId !== ownerId) {
+    if (comment.ownerId !== ownerId && isAdmin !== 'admin') {
       return res.status(400).json({
-        message: 'Comments can only be updated by their owner. Request denied.',
+        message:
+          'Comments can only be updated by their owner or an admin. Request denied.',
       });
     }
 
@@ -145,8 +147,24 @@ async function updateCommentControl(req, res, next) {
 }
 
 async function deleteCommentControl(req, res, next) {
+  const { commentId } = req.params;
+  const ownerId = req.user.id;
+  const isAdmin = req.user.role;
   try {
-    const { commentId } = req.params;
+    const comment = await prisma.comment.findUnique({
+      where: { id: parseInt(commentId) },
+    });
+
+    if (!comment) {
+      res.status(404).json({ message: 'Comment not found.' });
+    }
+
+    if (comment.ownerId !== ownerId && isAdmin !== 'admin') {
+      res.status(403).json({
+        message:
+          'Comments can only be deleted by their author or an admin. Request denied.',
+      });
+    }
     const deleteComment = await prisma.comment.delete({
       where: { id: parseInt(commentId) },
     });

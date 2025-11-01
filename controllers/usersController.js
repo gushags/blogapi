@@ -37,6 +37,10 @@ async function updateUserControl(req, res, next) {
   const { firstname, lastname, email, username, websiteUrl, avatarUrl, pwd } =
     req.body;
   const { userId } = req.params;
+  const isAdmin = req.user.role;
+
+  console.log('userId: ', userId);
+  console.log('req.user.id :', req.user.id);
 
   try {
     const errors = validationResult(req);
@@ -57,6 +61,13 @@ async function updateUserControl(req, res, next) {
       const hashedPassword = await bcrypt.hash(pwd, 10);
       updateData.hashedPwd = hashedPassword;
     }
+
+    if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {
+      res.status(403).json({
+        message:
+          'Users can only be updated by the user or an admin. Request denied.',
+      });
+    }
     const user = await prisma.user.update({
       where: { id: parseInt(userId) },
       data: updateData,
@@ -73,8 +84,15 @@ async function updateUserControl(req, res, next) {
 }
 
 async function deleteUserControl(req, res, next) {
+  const { userId } = req.params;
+  const isAdmin = req.user.role;
   try {
-    const { userId } = req.params;
+    if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {
+      return res.status(403).json({
+        message:
+          'Users can only be deleted by the user or an admin. Request denied.',
+      });
+    }
     const deleteUser = await prisma.user.delete({
       where: { id: parseInt(userId) },
     });
@@ -92,6 +110,7 @@ async function deleteUserControl(req, res, next) {
 }
 
 async function getAllUsersControl(req, res, next) {
+  // protected by authenticateAdminToken middleware
   try {
     const users = await prisma.user.findMany();
     if (users) {
@@ -106,8 +125,8 @@ async function getAllUsersControl(req, res, next) {
 }
 
 async function getUserControl(req, res, next) {
+  const { userId } = req.params;
   try {
-    const { userId } = req.params;
     const user = await prisma.user.findUnique({
       where: { id: parseInt(userId) },
     });

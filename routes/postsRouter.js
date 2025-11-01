@@ -30,7 +30,7 @@ const {
 } = require('../controllers/commentsController.js');
 
 /**
- *  ----- ROUTES -----
+ *  ----- POSTS ROUTES -----
  */
 
 // Get all posts
@@ -53,10 +53,15 @@ postsRouter.put(
 // Delete post
 postsRouter.delete('/:postId', authenticateToken, deletePostControl);
 
-// Comments
+/**
+ *  ----- COMMENTS ROUTES -----
+ */
+
+// Get all comments
 postsRouter.get('/:postId/comments', getCommentsControl);
 
 // Todo update the controller
+// Create a comment
 postsRouter.post(
   '/:postId/comments',
   validateNewComment,

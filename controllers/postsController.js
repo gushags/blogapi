@@ -7,6 +7,7 @@ const { buildCommentTree } = require('./utils/util');
 async function createPostControl(req, res, next) {
   const { title, content, published } = req.body;
   const authorId = req.user.id;
+
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -88,8 +89,8 @@ async function getPostsControl(req, res, next) {
 }
 
 async function getPostControl(req, res, next) {
+  const { postId } = req.params;
   try {
-    const { postId } = req.params;
     const post = await prisma.post.findUnique({
       where: { id: parseInt(postId) },
       include: {
@@ -149,6 +150,7 @@ async function updatePostControl(req, res, next) {
   const { title, content, published } = req.body;
   const { postId } = req.params;
   const authorId = req.user.id;
+  const isAdmin = req.user.role;
 
   try {
     const errors = validationResult(req);
@@ -167,10 +169,11 @@ async function updatePostControl(req, res, next) {
       res.status(404).json({ message: 'Post not found.' });
     }
 
-    if (post.authorId !== authorId) {
-      res
-        .status(403)
-        .json({ message: 'Posts can only be updated by their author.' });
+    if (post.authorId !== authorId && isAdmin !== 'admin') {
+      res.status(403).json({
+        message:
+          'Posts can only be updated by their author or an admin. Request denied.',
+      });
     }
 
     const updateData = {};
@@ -232,9 +235,10 @@ async function updatePostControl(req, res, next) {
 }
 
 async function deletePostControl(req, res, next) {
+  const { postId } = req.params;
+  const authorId = req.user.id;
+  const isAdmin = req.user.role;
   try {
-    const { postId } = req.params;
-    const authorId = req.user.id;
     const post = await prisma.post.findUnique({
       where: { id: parseInt(postId) },
     });
@@ -243,10 +247,10 @@ async function deletePostControl(req, res, next) {
       res.status(404).json({ message: 'Post not found.' });
     }
 
-    if (post.authorId !== authorId) {
-      res
-        .status(403)
-        .json({ message: 'Posts can only be deleted by their author.' });
+    if (post.authorId !== authorId && isAdmin !== 'admin') {
+      res.status(403).json({
+        message: 'Posts can only be deleted by their author or an admin.',
+      });
     }
     const deletePost = await prisma.post.delete({
       where: { id: parseInt(postId) },

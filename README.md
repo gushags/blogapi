@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-This project is a Node.js-based blog API built with Express, Prisma, and
+This project is a Node.js-based log API built with Express, Prisma, and
 Passport.js, designed for managing users, posts, and comments. It provides
-functionalities such as user authentication, CRUD operations for posts, and
-comment management.
+functionalities such as user authentication, admin authorization, and CRUD
+operations for users, posts, and comments.
 
 ## Key Features & Benefits
 
@@ -86,10 +86,30 @@ Follow these steps to set up the project:
 ### Authentication Endpoints
 
 - **`POST /auth/register`**: Register a new user. Requires `username`,
-  `password`, `firstname`, `lastname`, and `email` in the request body.
+  `password`, `firstname`, `lastname`, and `email` in the request body. Optional
+  values are `avatarUrl`, `websiteUrl`, `isAdmin` (default: false), and
+  `isAuthor` (default: false).
 - **`POST /auth/login`**: Authenticate a user. Requires `username` and
   `password` in the request body. JSON replies with a valid JWD (e.g.,
   `Authorization: Bearer <token>`).
+
+(Note: by default the Blog Api allows any logged-in user to create posts and
+comments. The optional `isAuthor` field can be used on the front end to restrict
+either of these if that makes sense for your application.)
+
+### Users Endpoints
+
+- **`GET /users`**: Retrieve all user. Requires admin level authentication.
+- **`GET /users/:id`**: Retrieve a single user by ID. Requires an authenticated
+  user.
+- **`PUT /users/:id`**: Update an existing user by ID. Requires an authenticated
+  user (`User ID == :id` or an admin level user) and a request body containing
+  the updated data.
+- **`DELETE /users/:id`**: Delete a user by ID. Requires an authenticated user
+  (`User ID == :id` or an admin level user).
+
+(Authenticated routes require a valid JWT in the `Authorization` header (e.g.,
+`Authorization: Bearer <token>`).)
 
 ### Posts Endpoints
 
@@ -108,9 +128,11 @@ Follow these steps to set up the project:
 
 - **`GET /posts/:postId/comments`**: Retrieve all comments for a specific post.
 - **`POST /posts/:postId/comments`**: Add a new comment to a post. Requires an
-  authenticated user and the comment `content` in the request body.
+  authenticated user and the `content`, `published`, `parentId`, and `postId` in
+  the request body.
 - **`PUT /posts/:postId/comments/:id`**: Update an existing comment by ID.
-  Requires an authenticated user and a request body containing the updated data.
+  Requires an authenticated user and a request body containing the updated data
+  (either `content` or `published`).
 - **`DELETE /posts/:postId/comments/:id`**: Delete a comment by ID. Requires an
   authenticated user.
 
@@ -154,7 +176,8 @@ Please ensure your code adheres to the project's coding standards.
 
 ## Acknowledgments
 
-- This project uses the `@faker-js/faker` library for generating seed data.
+- This project uses the `@faker-js/faker` library for generating seed data for
+  testing.
 - Thanks to the Prisma team for their excellent ORM.
 - Thanks to the Passport.js team for their flexible authentication middleware.
 - Built as part of the excellent Odin Project Curriculm

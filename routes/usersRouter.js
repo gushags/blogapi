@@ -14,20 +14,25 @@ const {
   updateUserControl,
 } = require('../controllers/usersController');
 
+/**
+ *  ----- USERS ROUTES -----
+ */
+
 // Get all users
-// should be admin to get
 usersRouter.get('/', authenticateAdminToken, getAllUsersControl);
 
 // Get one user
-// should be logged in == userId to see anything beyond username, avatar and website
-usersRouter.get('/:userId', getUserControl);
+usersRouter.get('/:userId', authenticateToken, getUserControl);
 
 // Update a user
-// Should be loggedin user to get
-usersRouter.put('/:userId', validateUpdateUser, updateUserControl);
+usersRouter.put(
+  '/:userId',
+  validateUpdateUser,
+  authenticateToken,
+  updateUserControl
+);
 
 // Delete a user
-// Should be logged in user
-usersRouter.delete('/:userId', deleteUserControl);
+usersRouter.delete('/:userId', authenticateToken, deleteUserControl);
 
 module.exports = usersRouter;
