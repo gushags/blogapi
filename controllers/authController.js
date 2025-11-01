@@ -6,13 +6,22 @@ const jwt = require('jsonwebtoken');
 async function authorizeLogin(req, res, next) {
   passport.authenticate('local', async (err, user, info) => {
     try {
-      if (err || !user) {
-        console.log(err);
-        const error = new Error('An error occurred.');
-        return next(error);
+      if (err) {
+        console.error('Passport error:', err);
+        return res
+          .status(500)
+          .json({ message: 'An internal server error occurred.' });
       }
-      req.login(user, { session: false }, async (error) => {
-        if (error) return next(error);
+      if (!user) {
+        return res
+          .status(401)
+          .json({ message: info?.message || 'Invalid credentials' });
+      }
+      req.login(user, { session: false }, async (loginError) => {
+        if (loginError) {
+          console.error('Login error:', loginErr);
+          return res.status(500).json({ message: 'Could not log in user.' });
+        }
 
         const token = jwt.sign(
           {
@@ -26,7 +35,7 @@ async function authorizeLogin(req, res, next) {
             expiresIn: '24h',
           }
         );
-        return res.json({
+        return res.status(200).json({
           token,
           user: {
             id: user.id,
@@ -38,8 +47,8 @@ async function authorizeLogin(req, res, next) {
         });
       });
     } catch (error) {
-      console.log(error);
-      return next(error);
+      console.error('Authorize login catch error:', error);
+      return res.status(500).json({ message: 'An unexpected error occurred.' });
     }
   })(req, res, next);
 }
