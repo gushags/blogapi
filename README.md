@@ -2,17 +2,15 @@
 
 ## Project Overview
 
-This project is a Node.js-based log API built with Express, Prisma, and
-Passport.js, designed for managing users, posts, and comments. It provides
-functionalities such as user authentication, admin authorization, and CRUD
-operations for users, posts, and comments.
+A Node.js blog API built with Express, Prisma, and Passport.js. Provides secure
+user authentication, admin authorization, and full CRUD functionality for users,
+posts, and comments.
 
 ## Key Features & Benefits
 
-- **User Authentication:** Secure user registration and authentication via
-  Passport.js with local strategy.
-- **CRUD Operations for Posts:** Create, read, update, and delete blog posts.
-- **Comment Management:** Add, retrieve, and manage comments on blog posts.
+- **User Authentication:** Register and log in securely via Passport.js (local
+  strategy).
+- **Posts and Comments:** Create, read, update, and delete posts and comments.
 - **Database Management:** Uses Prisma for efficient database access and
   management with PostgreSQL (or configured database).
 - **API Structure:** Well-structured controllers and utils for maintainability
@@ -23,9 +21,8 @@ operations for users, posts, and comments.
 Before you begin, ensure you have the following installed:
 
 - **Node.js:** Version 16 or higher is recommended.
-- **npm:** Node Package Manager (usually comes with Node.js).
 - **PostgreSQL:** A running instance of PostgreSQL database.
-- **Prisma CLI:** Required for database migrations and management.
+- **Prisma:** Required for database migrations and management.
 
 ## Installation & Setup Instructions
 
@@ -81,67 +78,48 @@ Follow these steps to set up the project:
    npm start
    ```
 
-## Usage Examples & API Documentation
+## API Usage
+
+Note: All endpoints marked as “Authenticated” require a valid JWT in the
+Authorization header (Authorization: Bearer <token>).
 
 ### Authentication Endpoints
 
-- **`POST /auth/register`**: Register a new user. Requires `username`,
-  `password`, `firstname`, `lastname`, and `email` in the request body. Optional
-  values are `avatarUrl`, `websiteUrl`, `isAdmin` (default: false), and
-  `isAuthor` (default: false).
-- **`POST /auth/login`**: Authenticate a user. Requires `username` and
-  `password` in the request body. JSON replies with a valid JWD (e.g.,
-  `Authorization: Bearer <token>`).
+- **`POST /auth/register`**: Register a new user. Register a new user. Required:
+  `username`, `password`, `firstname`, `lastname`, `email`. Optional:
+  `avatarUrl`, `websiteUrl`, `isAdmin`, `isAuthor`.
+- **`POST /auth/login`**: Authenticate user. Required: `username`, `password`.
+  Returns JWT and user info.
 
 (Note: by default the Blog Api allows any logged-in user to create posts and
 comments. The optional `isAuthor` field can be used on the front end to restrict
 either of these if that makes sense for your application.)
 
-### Users Endpoints
+### Users
 
-- **`GET /users`**: Retrieve all user. Requires admin level authentication.
-- **`GET /users/:id`**: Retrieve a single user by ID. Requires an authenticated
-  user.
-- **`PUT /users/:id`**: Update an existing user by ID. Requires an authenticated
-  user (`User ID == :id` or an admin level user) and a request body containing
-  the updated data.
-- **`DELETE /users/:id`**: Delete a user by ID. Requires an authenticated user
-  (`User ID == :id` or an admin level user).
-
-(Authenticated routes require a valid JWT in the `Authorization` header (e.g.,
-`Authorization: Bearer <token>`).)
+- **`GET /users`**: Retrieve all users (Admin only)
+- **`GET /users/:id`**: Retrieve a single user
+- **`PUT /users/:id`**: Update a user (User themselves or Admin)
+- **`DELETE /users/:id`**: Delete a user (User themselves or Admin)
 
 ### Posts Endpoints
 
-- **`GET /posts`**: Retrieve all posts with comments and replies to comments.
-- **`GET /posts/:id`**: Retrieve a single post by ID.
-- **`POST /posts`**: Create a new post. Requires an authenticated user and a
-  request body containing `title` and `content`.
-- **`PUT /posts/:id`**: Update an existing post by ID. Requires an authenticated
-  user and a request body containing the updated data.
-- **`DELETE /posts/:id`**: Delete a post by ID. Requires an authenticated user.
+- **`GET /posts`**: Retrieve all posts with comments
+- **`GET /posts/:id`**: Retrieve a single post
+- **`POST /posts`**: Create a new post (Authenticated)
+- **`PUT /posts/:id`**: Update a post (Authenticated)
+- **`DELETE /posts/:id`**: Delete a post (Authenticated)
 
-(Authenticated routes require a valid JWT in the `Authorization` header (e.g.,
-`Authorization: Bearer <token>`).)
+### Comments
 
-### Comments Endpoints
-
-- **`GET /posts/:postId/comments`**: Retrieve all comments for a specific post.
-- **`POST /posts/:postId/comments`**: Add a new comment to a post. Requires an
-  authenticated user and the `content`, `published`, `parentId`, and `postId` in
-  the request body.
-- **`PUT /posts/:postId/comments/:id`**: Update an existing comment by ID.
-  Requires an authenticated user and a request body containing the updated data
-  (either `content` or `published`).
-- **`DELETE /posts/:postId/comments/:id`**: Delete a comment by ID. Requires an
-  authenticated user.
-
-(Authenticated routes require a valid JWT in the `Authorization` header (e.g.,
-`Authorization: Bearer <token>`).)
+- **`GET /posts/:postId/comments`**: Get comments for a post
+- **`POST /posts/:postId/comments`**: Add a new comment (Authenticated)
+- **`PUT /posts/:postId/comments/:id`**: Update a comment (Authenticated)
+- **`DELETE /posts/:postId/comments/:id`**: Delete a comment (Authenticated)
 
 ### Example: Creating a Post
 
-```javascript
+```json
 // Sample request body for creating a post
 {
   "title": "My First Post",
@@ -150,17 +128,14 @@ either of these if that makes sense for your application.)
 }
 ```
 
-Send a `POST` request to `/posts` with the above JSON body and an
-`Authorization` header containing a valid JWT.
+Send a `POST` request to `/posts` with the JSON body and valid JWT in the
+`Authorization` header.
 
 ## Configuration Options
 
-- **`DATABASE_URL`**: The connection string for the PostgreSQL database. Defined
-  in the `.env` file.
-- **`JWT_SECRET`**: The secret key used for signing JWTs. Crucial for security.
-  Defined in the `.env` file.
-- **`PORT`**: The port on which the server runs. Defaults to 3000 if not set in
-  the `.env` file.
+- **`DATABASE_URL`**: PostgreSQL connection string
+- **`JWT_SECRET`**: Secret key for signing JWTs
+- **`PORT`**: Server port (default: 3000)
 
 ## Contributing Guidelines
 

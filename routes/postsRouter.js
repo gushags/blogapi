@@ -60,7 +60,6 @@ postsRouter.delete('/:postId', authenticateToken, deletePostControl);
 // Get all comments
 postsRouter.get('/:postId/comments', getCommentsControl);
 
-// Todo update the controller
 // Create a comment
 postsRouter.post(
   '/:postId/comments',
@@ -69,7 +68,7 @@ postsRouter.post(
   createCommentControl
 );
 
-// Todo update the controller -- user must be comment author
+// Update a comment
 postsRouter.put(
   '/:postId/comments/:commentId',
   validateUpdateComment,
