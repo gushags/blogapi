@@ -57,7 +57,7 @@ async function authenticateAdminToken(req, res, next) {
       email: user.email,
       role: user.isAdmin,
     };
-    if (req.user.role !== 'admin')
+    if (!user.isAdmin)
       return res
         .status(403)
         .json({ message: 'Only admins may access this route' });

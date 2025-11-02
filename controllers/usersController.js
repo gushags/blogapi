@@ -26,7 +26,12 @@ async function createUserControl(req, res, next) {
         pwd: hashedPassword,
       },
     });
-    res.status(200).json({ data: user });
+    const { hashedPwd, ...safeUser } = user; // Don't send pwd to client
+    res.status(200).json({
+      status: 'success',
+      data: safeUser,
+      message: 'User created successfully',
+    });
   } catch (err) {
     console.error(err);
     next(err); // let Express handle error
@@ -38,9 +43,6 @@ async function updateUserControl(req, res, next) {
     req.body;
   const { userId } = req.params;
   const isAdmin = req.user.role;
-
-  console.log('userId: ', userId);
-  console.log('req.user.id :', req.user.id);
 
   try {
     const errors = validationResult(req);
@@ -63,7 +65,8 @@ async function updateUserControl(req, res, next) {
     }
 
     if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {
-      res.status(403).json({
+      return res.status(403).json({
+        status: 'error',
         message:
           'Users can only be updated by the user or an admin. Request denied.',
       });
@@ -72,7 +75,12 @@ async function updateUserControl(req, res, next) {
       where: { id: parseInt(userId) },
       data: updateData,
     });
-    res.status(200).json({ data: user, message: 'User updated successfully.' });
+    const { hashedPwd, ...safeUser } = user;
+    res.status(200).json({
+      status: 'success',
+      data: safeUser,
+      message: 'User updated successfully.',
+    });
   } catch (err) {
     console.error(err);
     if (err.code === 'P2025') {
@@ -89,6 +97,7 @@ async function deleteUserControl(req, res, next) {
   try {
     if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {
       return res.status(403).json({
+        status: 'error',
         message:
           'Users can only be deleted by the user or an admin. Request denied.',
       });
@@ -96,14 +105,19 @@ async function deleteUserControl(req, res, next) {
     const deleteUser = await prisma.user.delete({
       where: { id: parseInt(userId) },
     });
-    res
-      .status(200)
-      .json({ data: deleteUser, message: 'Successfully deleted user.' });
+    const { hashedPwd, ...safeDelete } = deleteUser;
+    res.status(200).json({
+      status: 'success',
+      data: safeDelete, // Don't send password
+      message: 'Successfully deleted user.',
+    });
   } catch (err) {
     console.error(err);
     if (err.code === 'P2025') {
       // Prisma error: record not found
-      return res.status(404).json({ message: 'User not found.' });
+      return res
+        .status(404)
+        .json({ status: 'error', message: 'User not found.' });
     }
     next(err); // let Express handle error
   }
@@ -112,11 +126,31 @@ async function deleteUserControl(req, res, next) {
 async function getAllUsersControl(req, res, next) {
   // protected by authenticateAdminToken middleware
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        firstname: true,
+        lastname: true,
+        avatarUrl: true,
+        websiteUrl: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
     if (users) {
-      res.status(200).json({ data: users });
+      res.status(200).json({
+        status: 'success',
+        data: users,
+        message: 'All users successfully found.',
+      });
     } else {
-      res.status(400).json({ error: 'There are no users in the system.' });
+      res.status(400).json({
+        status: 'error',
+        error: 'There are no users in the system.',
+      });
     }
   } catch (err) {
     console.error(err);
@@ -131,18 +165,24 @@ async function getUserControl(req, res, next) {
       where: { id: parseInt(userId) },
     });
     if (user) {
-      res.status(200).json({ data: user });
+      const { hashedPwd, ...safeUser } = user;
+      res
+        .status(200)
+        .json({ status: 'success', data: safeUser, message: 'User found' });
     } else {
       res.status(404).json({
-        error: 'There is no user with that userId.',
+        status: 'error',
         data: req.params,
+        message: 'There is no user with that userId.',
       });
     }
   } catch (err) {
     console.error(err);
     if (err.code === 'P2025') {
       // Prisma error: record not found
-      return res.status(404).json({ message: 'User not found.' });
+      return res
+        .status(404)
+        .json({ status: 'error', message: 'User not found.' });
     }
     next(err); // let Express handle error
   }
