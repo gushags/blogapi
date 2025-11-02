@@ -86,6 +86,7 @@ async function main() {
         email: user.email,
         avatarUrl: user.avatarUrl,
         websiteUrl: user.websiteUrl,
+        bio: user.bio,
         hashedPwd: hashedPassword,
       },
     });
