@@ -19,6 +19,7 @@ for (let i = 0; i < 20; i++) {
   });
   const avatarUrl = faker.image.avatar();
   const websiteUrl = faker.internet.url();
+  const bio = faker.person.bio();
   const pwd = 'irish';
   users.push({
     firstname,
@@ -27,6 +28,7 @@ for (let i = 0; i < 20; i++) {
     email,
     avatarUrl,
     websiteUrl,
+    bio,
     pwd,
   });
 }

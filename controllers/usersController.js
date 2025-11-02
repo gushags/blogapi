@@ -4,8 +4,16 @@ const prisma = require('../config/prismaPool');
 const { validationResult } = require('express-validator');
 
 async function createUserControl(req, res, next) {
-  const { username, firstname, lastname, email, websiteUrl, avatarUrl, pwd } =
-    req.body;
+  const {
+    username,
+    firstname,
+    lastname,
+    email,
+    websiteUrl,
+    avatarUrl,
+    bio,
+    pwd,
+  } = req.body;
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -23,6 +31,7 @@ async function createUserControl(req, res, next) {
         email: email,
         avatarUrl: avatarUrl,
         websiteUrl: websiteUrl,
+        bio: bio,
         pwd: hashedPassword,
       },
     });
@@ -30,7 +39,7 @@ async function createUserControl(req, res, next) {
     res.status(200).json({
       status: 'success',
       data: safeUser,
-      message: 'User created successfully',
+      message: 'User created successfully.',
     });
   } catch (err) {
     console.error(err);
@@ -39,8 +48,16 @@ async function createUserControl(req, res, next) {
 }
 
 async function updateUserControl(req, res, next) {
-  const { firstname, lastname, email, username, websiteUrl, avatarUrl, pwd } =
-    req.body;
+  const {
+    firstname,
+    lastname,
+    email,
+    username,
+    websiteUrl,
+    avatarUrl,
+    bio,
+    pwd,
+  } = req.body;
   const { userId } = req.params;
   const isAdmin = req.user.role;
 
@@ -59,6 +76,7 @@ async function updateUserControl(req, res, next) {
     if (username !== undefined) updateData.username = username;
     if (websiteUrl !== undefined) updateData.websiteUrl = websiteUrl;
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
+    if (bio !== undefined) updateData.bio = bio;
     if (pwd !== undefined) {
       const hashedPassword = await bcrypt.hash(pwd, 10);
       updateData.hashedPwd = hashedPassword;
@@ -135,6 +153,7 @@ async function getAllUsersControl(req, res, next) {
         lastname: true,
         avatarUrl: true,
         websiteUrl: true,
+        bio: true,
         role: true,
         createdAt: true,
         updatedAt: true,
@@ -166,9 +185,11 @@ async function getUserControl(req, res, next) {
     });
     if (user) {
       const { hashedPwd, ...safeUser } = user;
-      res
-        .status(200)
-        .json({ status: 'success', data: safeUser, message: 'User found' });
+      res.status(200).json({
+        status: 'success',
+        data: safeUser,
+        message: 'User successfully found.',
+      });
     } else {
       res.status(404).json({
         status: 'error',
