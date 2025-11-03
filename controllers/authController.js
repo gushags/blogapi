@@ -19,7 +19,7 @@ async function authorizeLogin(req, res, next) {
       }
       req.login(user, { session: false }, async (loginError) => {
         if (loginError) {
-          console.error('Login error:', loginErr);
+          console.error('Login error:', loginError);
           return res.status(500).json({ message: 'Could not log in user.' });
         }
 
@@ -40,6 +40,8 @@ async function authorizeLogin(req, res, next) {
           user: {
             id: user.id,
             username: user.username,
+            firstname: user.firstname,
+            lastname: user.lastname,
             email: user.email,
             role: user.isAdmin ? 'admin' : 'user',
           },

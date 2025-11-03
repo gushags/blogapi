@@ -23,6 +23,8 @@ async function authenticateToken(req, res, next) {
 
     req.user = {
       id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
       username: user.username,
       email: user.email,
       role: user.isAdmin,
@@ -53,6 +55,8 @@ async function authenticateAdminToken(req, res, next) {
 
     req.user = {
       id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
       username: user.username,
       email: user.email,
       role: user.isAdmin,
