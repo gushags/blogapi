@@ -6,6 +6,7 @@ const { buildCommentTree } = require('./utils/util');
 
 async function createCommentControl(req, res, next) {
   const { content, published, parentId, postId } = req.body;
+  const pubTrueOrFalse = published === 'true'; // converts published string to boolean
   const ownerId = req.user.id;
   try {
     const errors = validationResult(req);
@@ -18,7 +19,7 @@ async function createCommentControl(req, res, next) {
     const comment = await prisma.comment.create({
       data: {
         content: content,
-        published: Boolean(published),
+        published: pubTrueOrFalse,
         ownerId: ownerId,
         parentId: parseInt(parentId) || null,
         postId: parseInt(postId),
