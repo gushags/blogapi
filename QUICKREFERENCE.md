@@ -12,12 +12,12 @@ header: `Authorization: Bearer <token>`
 
 ### Users
 
-| Endpoint     | Method | Auth       | Request Body                                                                                                                                                                                                                                      |
-| ------------ | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/users`     | GET    | Admin      | –                                                                                                                                                                                                                                                 |
-| `/users/:id` | GET    | User/Admin | –                                                                                                                                                                                                                                                 |
-| `/users/:id` | PUT    | User/Admin | `json { "username": "string (optional)", "firstname": "string (optional)", "lastname": "string (optional)", "email": "string (optional)", "avatarUrl": "string (optional)", "websiteUrl": "string (optional)", "password": "string (optional)" }` |
-| `/users/:id` | DELETE | User/Admin | –                                                                                                                                                                                                                                                 |
+| Endpoint     | Method | Auth       | Request Body                                                                                                                                                                                                                                                                  |
+| ------------ | ------ | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/users`     | GET    | Admin      | –                                                                                                                                                                                                                                                                             |
+| `/users/:id` | GET    | User/Admin | –                                                                                                                                                                                                                                                                             |
+| `/users/:id` | PUT    | User/Admin | `json { "username": "string (optional)", "firstname": "string (optional)", "lastname": "string (optional)", "email": "string (optional)", "bio": "string (optional)", "avatarUrl": "string (optional)", "websiteUrl": "string (optional)", "password": "string (optional)" }` |
+| `/users/:id` | DELETE | User/Admin | –                                                                                                                                                                                                                                                                             |
 
 ### Posts
 

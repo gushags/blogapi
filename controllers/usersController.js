@@ -2,6 +2,7 @@
 
 const prisma = require('../config/prismaPool');
 const { validationResult } = require('express-validator');
+const bcrypt = require('bcrypt');
 
 async function createUserControl(req, res, next) {
   const {
@@ -32,7 +33,7 @@ async function createUserControl(req, res, next) {
         avatarUrl: avatarUrl,
         websiteUrl: websiteUrl,
         bio: bio,
-        pwd: hashedPassword,
+        hashedPwd: hashedPassword,
       },
     });
     const { hashedPwd, ...safeUser } = user; // Don't send pwd to client
