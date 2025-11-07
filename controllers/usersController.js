@@ -58,6 +58,7 @@ async function updateUserControl(req, res, next) {
     avatarUrl,
     bio,
     pwd,
+    newPwd,
   } = req.body;
   const { userId } = req.params;
   const isAdmin = req.user.role;
@@ -79,8 +80,19 @@ async function updateUserControl(req, res, next) {
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
     if (bio !== undefined) updateData.bio = bio;
     if (pwd !== undefined) {
+      const pwdCheckUser = await prisma.user.findUnique({
+        where: { id: parseInt(userId) },
+      });
       const hashedPassword = await bcrypt.hash(pwd, 10);
-      updateData.hashedPwd = hashedPassword;
+      if (pwdCheckUser.hashedPwd === hashedPassword) {
+        updateData.hashedPwd = hashedPassword;
+      } else {
+        return res.status(403).json({
+          status: 'error',
+          message:
+            'Incorrect password. You must enter a correct password before you can change it. Request denied',
+        });
+      }
     }
 
     if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {

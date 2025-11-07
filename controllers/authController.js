@@ -43,6 +43,7 @@ async function authorizeLogin(req, res, next) {
             firstname: user.firstname,
             lastname: user.lastname,
             email: user.email,
+            avatarUrl: user.avatarUrl,
             role: user.isAdmin ? 'admin' : 'user',
           },
           message: 'User successfully logged in',
