@@ -79,13 +79,14 @@ async function updateUserControl(req, res, next) {
     if (websiteUrl !== undefined) updateData.websiteUrl = websiteUrl;
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
     if (bio !== undefined) updateData.bio = bio;
-    if (pwd !== undefined) {
+    if (pwd !== undefined && newPwd !== undefined) {
       const pwdCheckUser = await prisma.user.findUnique({
         where: { id: parseInt(userId) },
       });
       const hashedPassword = await bcrypt.hash(pwd, 10);
-      if (pwdCheckUser.hashedPwd === hashedPassword) {
-        updateData.hashedPwd = hashedPassword;
+      if (bcrypt.compare(pwdCheckUser.hashedPwd, hashedPassword)) {
+        const newHashPwd = await bcrypt.hash(newPwd, 10);
+        updateData.hashedPwd = newHashPwd;
       } else {
         return res.status(403).json({
           status: 'error',
