@@ -59,9 +59,9 @@ async function updateUserControl(req, res, next) {
     bio,
     pwd,
     newPwd,
+    isAdmin,
   } = req.body;
   const { userId } = req.params;
-  const isAdmin = req.user.role;
 
   try {
     const errors = validationResult(req);
@@ -79,6 +79,9 @@ async function updateUserControl(req, res, next) {
     if (websiteUrl !== undefined) updateData.websiteUrl = websiteUrl;
     if (avatarUrl !== undefined) updateData.avatarUrl = avatarUrl;
     if (bio !== undefined) updateData.bio = bio;
+    if (isAdmin !== undefined && req.user.role === 'admin') {
+      updateData.isAdmin = isAdmin;
+    }
     if (pwd !== undefined && newPwd !== undefined) {
       const pwdCheckUser = await prisma.user.findUnique({
         where: { id: parseInt(userId) },
@@ -96,7 +99,7 @@ async function updateUserControl(req, res, next) {
       }
     }
 
-    if (req.user.id !== parseInt(userId) && isAdmin !== 'admin') {
+    if (req.user.id !== parseInt(userId) && req.user.role !== 'admin') {
       return res.status(403).json({
         status: 'error',
         message:
@@ -168,10 +171,16 @@ async function getAllUsersControl(req, res, next) {
         avatarUrl: true,
         websiteUrl: true,
         bio: true,
-        role: true,
         createdAt: true,
         updatedAt: true,
+        isAdmin: true,
+        isAuthor: true,
       },
+      orderBy: [
+        {
+          lastname: 'asc',
+        },
+      ],
     });
     if (users) {
       res.status(200).json({

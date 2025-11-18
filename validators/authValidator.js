@@ -27,7 +27,7 @@ async function authenticateToken(req, res, next) {
       lastname: user.lastname,
       username: user.username,
       email: user.email,
-      role: user.isAdmin,
+      role: user.isAdmin ? 'admin' : 'user',
     };
     next();
   } catch (err) {
@@ -59,14 +59,14 @@ async function authenticateAdminToken(req, res, next) {
       lastname: user.lastname,
       username: user.username,
       email: user.email,
-      role: user.isAdmin,
+      role: user.isAdmin ? 'admin' : 'user',
     };
+    console.log('req.user: ', req.user); // Current user from JWT
     if (!user.isAdmin)
       return res
         .status(403)
         .json({ message: 'Only admins may access this route' });
 
-    console.log('req.user: ', req.user); // Current user from JWT
     next();
   } catch (err) {
     return res.status(403).json({ message: 'Invalid or expired token' });

@@ -83,4 +83,52 @@ const validateUpdateUser = [
     .withMessage('Password must be at least 5 characters'),
 ];
 
-module.exports = { validateNewUser, validateUpdateUser, validatePassword };
+const validateNewAdminUser = [
+  body('firstname')
+    .trim()
+    .notEmpty()
+    .withMessage('First name is required')
+    .isAlpha()
+    .withMessage('Only letters are allowed in first names'),
+  body('lastname')
+    .trim()
+    .notEmpty()
+    .withMessage('Last name is required')
+    .isAlpha()
+    .withMessage('Only letters are allowed in last names'),
+  body('username')
+    .trim()
+    .notEmpty()
+    .custom(async (value) => {
+      const user = await prisma.user.findUnique({ where: { username: value } });
+      if (user) {
+        throw new Error('Username already in use');
+      }
+    }),
+  body('email')
+    .isEmail()
+    .withMessage('Valid email required')
+    .custom(async (value) => {
+      const user = await prisma.user.findUnique({ where: { email: value } });
+      if (user) {
+        throw new Error('E-mail already in use');
+      }
+    }),
+  body('pwd')
+    .isLength({ min: 5 })
+    .withMessage('Password must be at least 5 characters'),
+  body('admincode').custom((value) => {
+    if (value !== process.env.ADMIN_CODE) {
+      throw new Error(
+        'Incorrect admin code. Contact the blog administrator if you wish to register as an admin'
+      );
+    }
+  }),
+];
+
+module.exports = {
+  validateNewUser,
+  validateUpdateUser,
+  validatePassword,
+  validateNewAdminUser,
+};
